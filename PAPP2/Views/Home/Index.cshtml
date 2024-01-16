@@ -1,0 +1,74 @@
+﻿@model IEnumerable<PAPP2.Models.UnidadeCurricular>
+
+@{
+    ViewData["Title"] = "UCs";
+}
+
+<h1>Lista das UCs</h1>
+<p>Ano : 
+    @if (User.Identity.IsAuthenticated)
+    {
+        @Context.Session.GetInt32("Ano")
+    } else{
+        @DateTime.Now.Year
+    }
+    </p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Codigo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Nome)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ECTS)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Inscricoes)
+            </th>
+            <th>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <text>Ação</text>
+                }
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Codigo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Nome)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ECTS)
+                </td>
+                <td id="Linha_@item.Codigo">
+                    @Html.DisplayFor(modelItem => item.Inscricoes.Count)
+                </td>
+                <td>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        // ver se não está inscrito
+                        @if (item.Inscricoes.Any(i => i.Username == User.Identity.Name) == false)
+                        {
+                            <a asp-action="Inscreve" asp-route-id="@item.Codigo"
+                            data-ajax="true" data-ajax-method="get"
+                               data-ajax-mode="replace" data-ajax-update="#Linha_@item.Codigo">Inscreve</a>
+                        } else {
+                            <a asp-action="Desinscreve" asp-route-id="@item.Codigo"
+                               data-ajax="true" data-ajax-method="get"
+                               data-ajax-mode="replace" data-ajax-update="#Linha_@item.Codigo">Desinscreve</a>
+                        }
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
